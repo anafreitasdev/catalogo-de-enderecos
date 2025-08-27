@@ -1,0 +1,21 @@
+{
+  "welcome": "Welcome to Address Catalog",
+  "hello": "Hello! This is a complete system for managing addresses.",
+  "description": "Manage, search and organize your addresses efficiently.",
+  "features": {
+    "title": "Main Features",
+    "address": "Complete address registration",
+    "search": "Advanced search and filters",
+    "management": "Organized data management"
+  },
+  "table": {
+    "header": {
+      "name": "Name",
+      "address": "Address",
+      "city": "City",
+      "state": "State",
+      "zip": "ZIP",
+      "actions": "Actions"
+    }
+  }
+}

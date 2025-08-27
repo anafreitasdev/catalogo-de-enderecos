@@ -1,0 +1,21 @@
+{
+  "welcome": "Bem-vindo ao Catálogo de Endereços",
+  "hello": "Olá! Este é um sistema completo para gerenciar endereços.",
+  "description": "Gerencie, pesquise e organize seus endereços de forma eficiente.",
+  "features": {
+    "title": "Funcionalidades Principais",
+    "address": "Cadastro completo de endereços",
+    "search": "Busca avançada e filtros",
+    "management": "Gerenciamento organizado de dados"
+  },
+  "table": {
+    "header": {
+      "name": "Nome",
+      "address": "Endereço",
+      "city": "Cidade",
+      "state": "Estado",
+      "zip": "CEP",
+      "actions": "Ações"
+    }
+  }
+}
