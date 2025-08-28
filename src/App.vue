@@ -1,5 +1,11 @@
 <script setup lang="ts">
-// App principal
+import { useCatalogo } from "./database/composables/useCatalogo";
+import { onMounted } from "vue";
+
+const { listar} = useCatalogo();
+
+onMounted(() => { listar(); });
+
 </script>
 
 <template>
