@@ -18,13 +18,13 @@ Um sistema moderno e responsivo para gerenciamento de endereços, construído co
 - **Roteamento**: Vue Router 4
 - **Internacionalização**: Vue i18n
 - **Gerenciamento de Estado**: Pinia
-- **Build Tool**: Vite
+- **Build Tool**: Vite 5
 - **Linting**: ESLint + TypeScript
 
 ## Como Executar
 
 ### Pré-requisitos
-- Node.js 18+ 
+- Node.js 18+ (compatível com Node.js 18.20.4)
 - npm ou yarn
 
 ### Instalação
