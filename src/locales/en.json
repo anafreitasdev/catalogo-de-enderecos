@@ -9,13 +9,36 @@
     "management": "Organized data management"
   },
   "table": {
+    "title": "Address List",
+    "buttons": {
+      "add": "New Address",
+      "export": "Export CSV",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "inputs": {
+      "search": "Search by city"
+    },
     "header": {
       "name": "Name",
       "address": "Address",
       "city": "City",
       "state": "State",
       "zip": "ZIP",
+      "neighborhood": "Neighborhood",
+      "street": "Street",
+      "number": "Number",
       "actions": "Actions"
+    },
+     "modal": {
+      "edit": {
+        "title": "Edit Address"
+      },
+      "add": {
+        "title": "Add new address"
+      }
     }
   }
 }

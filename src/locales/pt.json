@@ -9,13 +9,36 @@
     "management": "Gerenciamento organizado de dados"
   },
   "table": {
+     "title": "Lista de endereços",
+    "buttons": {
+      "add": "Novo endereço",
+      "export": "Exportar CSV",
+      "edit": "Editar",
+      "delete": "Excluir",
+      "cancel": "Cancelar",
+      "save": "Salvar"
+    },
+    "inputs": {
+      "search": "Pesquisar por cidade"
+    },
     "header": {
       "name": "Nome",
       "address": "Endereço",
       "city": "Cidade",
       "state": "Estado",
       "zip": "CEP",
+      "neighborhood": "Bairro",
+      "street": "Rua",
+      "number": "Número",
       "actions": "Ações"
+    },
+    "modal": {
+      "edit": {
+        "title": "Editar Endereço"
+      },
+      "add": {
+        "title": "Adicionar Novo Endereço"
+      }
     }
   }
 }
