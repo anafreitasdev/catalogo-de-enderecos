@@ -1,4 +1,3 @@
-// src/composables/useCatalogo.ts
 import { ref } from "vue";
 import { initDB, exec, selectAll, saveToIndexedDB } from "../db/sqlite";
 
