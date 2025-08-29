@@ -12,8 +12,9 @@
           {{ $t("table.buttons.add") }}
         </button>
         <button
+          :disabled="!hasAddress"
           @click="exportCSV"
-          class="bg-blue-900 hover:bg-blue-800 text-white font-medium w-40 py-3 rounded-3xl text-xs md:text-sm"
+          class="bg-blue-900 hover:bg-blue-800 text-white font-medium w-40 py-3 rounded-3xl text-xs md:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {{ $t("table.buttons.export") }}
         </button>
@@ -35,27 +36,27 @@
         />
       </div>
     </div>
-    <AddressTable @edit="editAddress" :addresses="addressList" @delete="deleteAddress" />
+    <AddressTable
+      @edit="editAddress"
+      :addresses="addressList"
+      @delete="deleteAddress"
+    />
     <AddressModal
       v-if="showModal"
       :address="currentAddress"
       :show="showModal"
-      @close="showModal = false"
+      @close="closeModal"
       :typeAction="typeAction"
       @submit="insertOrEditAddress"
     />
-    
+
     <!-- Componente de Loading -->
-    <LoadingComponent 
-      ref="loadingRef"
-      :timeout="1000"
-      :auto-start="false"
-    />
+    <LoadingComponent ref="loadingRef" :timeout="1000" :auto-start="false" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import AddressTable from "./components/AddressTable.vue";
 import AddressModal from "./components/AddressModal.vue";
 import LoadingComponent from "../../components/LoadingComponent.vue";
@@ -73,6 +74,9 @@ const timeOut = ref<NodeJS.Timeout | undefined>();
 const currentAddress = ref<IAddress>();
 const loadingRef = ref<InstanceType<typeof LoadingComponent> | null>(null);
 
+const hasAddress = computed(() => {
+  return addressList.value.length > 0;
+});
 
 const editAddress = (adress: IAddress) => {
   currentAddress.value = adress;
@@ -122,7 +126,6 @@ const exportCSV = () => {
     "number",
   ];
 
-
   const headerLabels = [
     t("table.header.zip"),
     t("table.header.state"),
@@ -165,6 +168,12 @@ const listAddresses = async () => {
   addressList.value = addressStore.addresses;
 };
 
+const closeModal = () => {
+  showModal.value = false;
+  currentAddress.value = undefined;
+  typeAction.value = "";
+};
+
 watch(search, (newSearch) => {
   if (timeOut) {
     clearTimeout(timeOut.value);
@@ -182,5 +191,4 @@ const showLoading = () => {
     loadingRef.value.startLoading();
   }
 };
-
 </script>
