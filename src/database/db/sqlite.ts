@@ -1,12 +1,8 @@
-// src/db/sqlite.ts
 import initSqlJs, { type Database } from "sql.js";
 
-
-// 🔑 chave para persistência no IndexedDB
 const IDB_KEY = "meu-db.sqlite";
 let db: Database | null = null;
 
-// Utilitário simples de IndexedDB (sem libs externas)
 function idbGet(key: string): Promise<Uint8Array | null> {
   return new Promise((resolve, reject) => {
     const open = indexedDB.open("SQLJS_IDB", 1);
@@ -45,21 +41,18 @@ export async function initDB(): Promise<Database> {
   if (db) return db;
 
   const SQL = await initSqlJs({
-    // usa CDN oficial do sql.js
     locateFile: (f) => `https://sql.js.org/dist/${f}`,
   });
 
-  // tenta carregar dump do IndexedDB
   const saved = await idbGet(IDB_KEY);
   db = saved ? new SQL.Database(saved) : new SQL.Database();
 
-  // === MIGRAÇÕES/SCHEMA ===
-  // usamos PRAGMA user_version para controlar versões do schema
-  const ver = db.exec("PRAGMA user_version;")[0]?.values?.[0]?.[0] as number | undefined;
+  const ver = db.exec("PRAGMA user_version;")[0]?.values?.[0]?.[0] as
+    | number
+    | undefined;
   const version = Number.isFinite(ver) ? (ver as number) : 0;
 
   if (version < 1) {
-    // cria tabela enderecos (se ainda não existir)
     db.run(`
       CREATE TABLE IF NOT EXISTS enderecos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -73,28 +66,34 @@ export async function initDB(): Promise<Database> {
       CREATE INDEX IF NOT EXISTS idx_enderecos_cep ON enderecos (cep);
       PRAGMA user_version = 1;
     `);
-    await saveToIndexedDB(); // persiste schema
+    await saveToIndexedDB(); 
   }
 
   return db!;
 }
 
-// Execução de comandos (INSERT/UPDATE/DELETE/DDL)
-export function exec(sql: string, params: (string | number | null)[] = []): void {
+
+export function exec(
+  sql: string,
+  params: (string | number | null)[] = []
+): void {
   if (!db) throw new Error("DB não inicializado. Chame initDB() antes.");
   const stmt = db.prepare(sql);
   try {
     stmt.bind(params);
     while (stmt.step()) {
-      // Para statements que retornam linhas, apenas itera (sem uso).
+    
     }
   } finally {
     stmt.free();
   }
 }
 
-// Consulta que retorna array tipado
-export function selectAll<T = any>(sql: string, params: (string | number | null)[] = []): T[] {
+
+export function selectAll<T = any>(
+  sql: string,
+  params: (string | number | null)[] = []
+): T[] {
   if (!db) throw new Error("DB não inicializado. Chame initDB() antes.");
   const stmt = db.prepare(sql);
   const rows: T[] = [];
@@ -104,7 +103,6 @@ export function selectAll<T = any>(sql: string, params: (string | number | null)
     while (stmt.step()) {
       const row: any = {};
       const values = stmt.getAsObject() as Record<string, unknown>;
-      // garante ordem/nomes por coluna
       cols.forEach((c) => (row[c] = values[c]));
       rows.push(row as T);
     }
@@ -114,14 +112,14 @@ export function selectAll<T = any>(sql: string, params: (string | number | null)
   return rows;
 }
 
-// Exporta e salva o DB inteiro no IndexedDB
+
 export async function saveToIndexedDB(): Promise<void> {
   if (!db) throw new Error("DB não inicializado. Chame initDB() antes.");
   const data = db.export(); // Uint8Array
   await idbSet(IDB_KEY, data);
 }
 
-// Opcional: reset total (útil para testes)
+
 export async function resetDB(): Promise<void> {
   db = null;
   const SQL = await initSqlJs({
