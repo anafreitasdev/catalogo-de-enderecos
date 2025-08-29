@@ -29,10 +29,16 @@
           </tr>
         </thead>
         <tbody>
+          <tr v-if="!addresses.length">
+            <td :colspan="7" class="px-4 py-6 text-center text-gray-400">
+              <p>Nenhum endereço encontrado.</p>
+            </td>
+          </tr>
           <tr
             v-for="(address, idx) in addresses"
             :key="idx"
             class="border-t text-sm"
+            v-else
           >
             <td class="px-4 py-2 text-gray-700">{{ address.cep }}</td>
             <td class="px-4 py-2 text-gray-700">{{ address.estado }}</td>
