@@ -44,6 +44,13 @@
       :typeAction="typeAction"
       @submit="insertOrEditAddress"
     />
+    
+    <!-- Componente de Loading -->
+    <LoadingComponent 
+      ref="loadingRef"
+      :timeout="1000"
+      :auto-start="false"
+    />
   </div>
 </template>
 
@@ -51,18 +58,21 @@
 import { ref, onMounted, watch } from "vue";
 import AddressTable from "./components/AddressTable.vue";
 import AddressModal from "./components/AddressModal.vue";
+import LoadingComponent from "../../components/LoadingComponent.vue";
 import type { IAddress } from "../../models/AddressInterface";
-import { useAddressStore } from "../../../src/stores/AddressStore";
+import { useAddressStore } from "../../stores/AddressStore";
 import { useI18n } from "vue-i18n";
 
 const search = ref("");
 const showModal = ref(false);
 const typeAction = ref("");
-const { locale } = useI18n();
+const { t, locale } = useI18n();
 const addressStore = useAddressStore();
 const addressList = ref<IAddress[]>([]);
 const timeOut = ref<NodeJS.Timeout | undefined>();
 const currentAddress = ref<IAddress>();
+const loadingRef = ref<InstanceType<typeof LoadingComponent> | null>(null);
+
 
 const editAddress = (adress: IAddress) => {
   currentAddress.value = adress;
@@ -111,13 +121,15 @@ const exportCSV = () => {
     "street",
     "number",
   ];
+
+
   const headerLabels = [
-    "CEP",
-    "Estado",
-    "Cidade",
-    "Bairro",
-    "Logradouro",
-    "Número",
+    t("table.header.zip"),
+    t("table.header.state"),
+    t("table.header.city"),
+    t("table.header.neighborhood"),
+    t("table.header.street"),
+    t("table.header.number"),
   ];
 
   const delimiter = locale.value === "pt" ? ";" : ",";
@@ -148,6 +160,7 @@ const exportCSV = () => {
 };
 
 const listAddresses = async () => {
+  showLoading();
   await addressStore.fetchAddresses();
   addressList.value = addressStore.addresses;
 };
@@ -164,4 +177,10 @@ watch(search, (newSearch) => {
 onMounted(async () => {
   await listAddresses();
 });
+const showLoading = () => {
+  if (loadingRef.value) {
+    loadingRef.value.startLoading();
+  }
+};
+
 </script>

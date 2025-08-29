@@ -45,5 +45,8 @@
         "title": "Adicionar Novo Endereço"
       }
     }
+  },
+  "loading": {
+    "message": "Carregando..."
   }
 }

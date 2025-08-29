@@ -45,5 +45,8 @@
         "title": "Add new address"
       }
     }
+  },
+  "loading": {
+    "message": "Loading..."
   }
 }

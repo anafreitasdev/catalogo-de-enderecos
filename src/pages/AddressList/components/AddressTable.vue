@@ -35,7 +35,7 @@
             </td>
           </tr>
           <tr
-            v-for="(address) in addresses"
+            v-for="(address, idx) in addresses"
             :key="address.id"
             class="border-t text-sm"
             v-else

@@ -95,7 +95,8 @@
           </button>
           <button
             @click="submit"
-            class="px-5 py-2 rounded-full bg-blue-900 text-white hover:bg-blue-800 text-xs md:text-sm"
+            :disabled="disableButton"
+            class="px-5 py-2 rounded-full bg-blue-900 text-white hover:bg-blue-800 text-xs md:text-sm disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             {{ $t("table.buttons.save") }}
           </button>
@@ -106,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, type PropType, watch } from "vue";
+import { onMounted, ref, type PropType, watch, computed } from "vue";
 import type { IAddress } from "../../../models/AddressInterface";
 import { ViaCepService } from "../../../services/viacep.service";
 import { allowOnlyNumbers, formatZipCode } from "../../../utils/maskUtils";
@@ -148,12 +149,12 @@ watch(
   }
 );
 
-function handleZipCodeInput(event: Event) {
+const handleZipCodeInput = (event: Event) => {
   const input = event.target as HTMLInputElement;
   form.value.cep = formatZipCode(input.value);
 }
 
-async function searchZipCode(cep: string) {
+const searchZipCode = async (cep: string) => {
   try {
     isLoadingCep.value = true;
     errorMessage.value = "";
@@ -170,7 +171,6 @@ async function searchZipCode(cep: string) {
     form.value.neighborhood = endereco.bairro;
     form.value.street = endereco.logradouro;
   } catch (error) {
-    console.error("Erro ao buscar CEP:", error);
 
     if (error instanceof Error) {
       if (error.message.includes("CEP não encontrado")) {
@@ -190,14 +190,18 @@ async function searchZipCode(cep: string) {
   }
 }
 
-function close() {
+const close = () => {
   emit("close");
 }
 
-function submit() {
+const submit = () => {
   emit("submit", form.value);
   close();
 }
+
+const disableButton = computed(() => {
+  return form.value.cep === "" || form.value.state === "" || form.value.city === "" || form.value.neighborhood === "" || form.value.street === "" || form.value.number === "";
+})
 
 onMounted(() => {
   if (props.address) {

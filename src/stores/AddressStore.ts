@@ -44,8 +44,6 @@ export const useAddressStore = defineStore('address', () => {
         } finally {
             loading.value = false
         }
-
-        console.log('dentro do addAddress', error.value);
     }
 
     async function updateAddress(id: number, address: IAddress) {

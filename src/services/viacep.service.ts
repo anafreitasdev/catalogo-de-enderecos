@@ -25,7 +25,6 @@ export const ViaCepService = {
 
       return data;
     } catch (error) {
-      console.error('Erro ao buscar CEP:', error);
       throw error;
     }
   }
