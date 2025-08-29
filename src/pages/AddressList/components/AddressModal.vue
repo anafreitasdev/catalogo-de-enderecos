@@ -21,7 +21,7 @@
         }}
       </h2>
 
-      <form @submit.prevent="submit" class="flex flex-col gap-3">
+      <form class="flex flex-col gap-3" @submit.prevent>
         <InputComponent
           v-model="form.cep"
           :placeholder="$t('table.header.zip')"
@@ -56,7 +56,7 @@
             {{ $t("table.buttons.cancel") }}
           </button>
           <button
-            type="submit"
+            @click="submit"
             class="px-5 py-2 rounded-full bg-blue-900 text-white hover:bg-blue-800 text-xs md:text-sm"
           >
             {{ $t("table.buttons.save") }}
@@ -72,9 +72,10 @@ import InputComponent from "../../../components/InputComponent.vue";
 import { onMounted, ref, type PropType } from "vue";
 import type { IAddress } from "../../../models/AddressInterface";
 
-const emit = defineEmits(["close"]);
+const emit = defineEmits(["close", "submit"]);
+
 const form = ref({
-  cep: "12312",
+  cep: "",
   state: "",
   city: "",
   neighborhood: "",
@@ -98,17 +99,18 @@ function close() {
 }
 
 function submit() {
-  return;
+  emit("submit", form.value);
+  close();
 }
 
 onMounted(() => {
   if (props.address) {
     form.value.cep = props.address.cep ?? "";
-    form.value.state = props.address.estado ?? "";
-    form.value.city = props.address.cidade ?? "";
-    form.value.neighborhood = props.address.bairro ?? "";
-    form.value.street = props.address.logradouro ?? "";
-    form.value.number = props.address.numero ?? "";
+    form.value.state = props.address.state ?? "";
+    form.value.city = props.address.city ?? "";
+    form.value.neighborhood = props.address.neighborhood ?? "";
+    form.value.street = props.address.street ?? "";
+    form.value.number = props.address.number ?? "";
   }
 });
 </script>

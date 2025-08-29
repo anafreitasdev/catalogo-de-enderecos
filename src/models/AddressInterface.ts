@@ -1,8 +1,9 @@
 export type IAddress = {
+  id?: number;
   cep: string;
-  estado: string;
-  cidade: string;
-  bairro: string;
-  logradouro: string;
-  numero: string;
+  state: string;
+  city: string;
+  neighborhood: string;
+  street: string;
+  number: string;
 };

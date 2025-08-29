@@ -1,113 +1,133 @@
-import initSqlJs from "sql.js";
-import type { Database, SqlJsStatic } from "sql.js";
+// src/db/sqlite.ts
+import initSqlJs, { type Database } from "sql.js";
 
-let SQL: SqlJsStatic | null = null;
+
+// 🔑 chave para persistência no IndexedDB
+const IDB_KEY = "meu-db.sqlite";
 let db: Database | null = null;
 
-const IDB_NAME = "VueSqliteDB";
-const IDB_STORE = "db";
-const IDB_KEY = "sqlite-binary";
-
-function openIDB(): Promise<IDBDatabase> {
+// Utilitário simples de IndexedDB (sem libs externas)
+function idbGet(key: string): Promise<Uint8Array | null> {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open(IDB_NAME, 1);
-    req.onupgradeneeded = () => {
-      const idb = req.result;
-      if (!idb.objectStoreNames.contains(IDB_STORE)) {
-        idb.createObjectStore(IDB_STORE);
-      }
+    const open = indexedDB.open("SQLJS_IDB", 1);
+    open.onupgradeneeded = () => {
+      open.result.createObjectStore("files");
     };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
+    open.onerror = () => reject(open.error);
+    open.onsuccess = () => {
+      const tx = open.result.transaction("files", "readonly");
+      const store = tx.objectStore("files");
+      const req = store.get(key);
+      req.onsuccess = () => resolve((req.result as Uint8Array) ?? null);
+      req.onerror = () => reject(req.error);
+    };
   });
 }
 
-export async function saveToIndexedDB(): Promise<void> {
-  if (!db) return;
-  const data = db.export();
-  const idb = await openIDB();
-  await new Promise<void>((resolve, reject) => {
-    const tx = idb.transaction(IDB_STORE, "readwrite");
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-    tx.objectStore(IDB_STORE).put(data, IDB_KEY);
+function idbSet(key: string, data: Uint8Array): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const open = indexedDB.open("SQLJS_IDB", 1);
+    open.onupgradeneeded = () => {
+      open.result.createObjectStore("files");
+    };
+    open.onerror = () => reject(open.error);
+    open.onsuccess = () => {
+      const tx = open.result.transaction("files", "readwrite");
+      const store = tx.objectStore("files");
+      const req = store.put(data, key);
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    };
   });
-  idb.close();
 }
-
-async function loadFromIndexedDB(): Promise<Uint8Array | null> {
-  const idb = await openIDB();
-  const res: Uint8Array | null = await new Promise((resolve, reject) => {
-    const tx = idb.transaction(IDB_STORE, "readonly");
-    const store = tx.objectStore(IDB_STORE);
-    const getReq = store.get(IDB_KEY);
-    getReq.onsuccess = () => resolve(getReq.result ?? null);
-    getReq.onerror = () => reject(getReq.error);
-  });
-  idb.close();
-  return res;
-}
-
-export type FileHandle = any;
-let currentHandle: FileHandle | null = null;
-
-export function getCurrentHandle() {
-  return currentHandle;
-}
-
-
-async function ensureSQL() {
-  if (!SQL) {
-    SQL = await initSqlJs({
-      locateFile: (file: string) => `https://sql.js.org/dist/${file}`
-    });
-  }
-}
-
-async function ensureSchema() {
-  if (!db) return;
-  db.run(`
-    CREATE TABLE IF NOT EXISTS enderecos (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      cep TEXT NOT NULL,
-      estado TEXT NOT NULL,
-      cidade TEXT NOT NULL,
-      bairro TEXT NOT NULL,
-      logradouro TEXT NOT NULL,
-      numero TEXT NOT NULL,
-      criado_em TEXT DEFAULT (datetime('now'))
-    );
-  `);
-}
-
 
 export async function initDB(): Promise<Database> {
   if (db) return db;
-  await ensureSQL();
 
-  const bytes = await loadFromIndexedDB();
-  db = bytes ? new SQL!.Database(bytes) : new SQL!.Database();
-  await ensureSchema();
+  const SQL = await initSqlJs({
+    // usa CDN oficial do sql.js
+    locateFile: (f) => `https://sql.js.org/dist/${f}`,
+  });
+
+  // tenta carregar dump do IndexedDB
+  const saved = await idbGet(IDB_KEY);
+  db = saved ? new SQL.Database(saved) : new SQL.Database();
+
+  // === MIGRAÇÕES/SCHEMA ===
+  // usamos PRAGMA user_version para controlar versões do schema
+  const ver = db.exec("PRAGMA user_version;")[0]?.values?.[0]?.[0] as number | undefined;
+  const version = Number.isFinite(ver) ? (ver as number) : 0;
+
+  if (version < 1) {
+    // cria tabela enderecos (se ainda não existir)
+    db.run(`
+      CREATE TABLE IF NOT EXISTS enderecos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        cep TEXT NOT NULL,
+        state TEXT NOT NULL,
+        city TEXT NOT NULL,
+        neighborhood TEXT NOT NULL,
+        street TEXT NOT NULL,
+        "number" TEXT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_enderecos_cep ON enderecos (cep);
+      PRAGMA user_version = 1;
+    `);
+    await saveToIndexedDB(); // persiste schema
+  }
+
   return db!;
 }
 
-
-export function exec(sql: string, params: any[] = []) {
-  if (!db) throw new Error("DB not initialized");
-  db.run(sql, params);
-}
-
-export function selectAll<T = any>(sql: string, params: any[] = []): T[] {
-  if (!db) throw new Error("DB not initialized");
+// Execução de comandos (INSERT/UPDATE/DELETE/DDL)
+export function exec(sql: string, params: (string | number | null)[] = []): void {
+  if (!db) throw new Error("DB não inicializado. Chame initDB() antes.");
   const stmt = db.prepare(sql);
-  const out: T[] = [];
   try {
     stmt.bind(params);
     while (stmt.step()) {
-      out.push(stmt.getAsObject() as T);
+      // Para statements que retornam linhas, apenas itera (sem uso).
     }
   } finally {
     stmt.free();
   }
-  return out;
+}
+
+// Consulta que retorna array tipado
+export function selectAll<T = any>(sql: string, params: (string | number | null)[] = []): T[] {
+  if (!db) throw new Error("DB não inicializado. Chame initDB() antes.");
+  const stmt = db.prepare(sql);
+  const rows: T[] = [];
+  try {
+    stmt.bind(params);
+    const cols = stmt.getColumnNames();
+    while (stmt.step()) {
+      const row: any = {};
+      const values = stmt.getAsObject() as Record<string, unknown>;
+      // garante ordem/nomes por coluna
+      cols.forEach((c) => (row[c] = values[c]));
+      rows.push(row as T);
+    }
+  } finally {
+    stmt.free();
+  }
+  return rows;
+}
+
+// Exporta e salva o DB inteiro no IndexedDB
+export async function saveToIndexedDB(): Promise<void> {
+  if (!db) throw new Error("DB não inicializado. Chame initDB() antes.");
+  const data = db.export(); // Uint8Array
+  await idbSet(IDB_KEY, data);
+}
+
+// Opcional: reset total (útil para testes)
+export async function resetDB(): Promise<void> {
+  db = null;
+  const SQL = await initSqlJs({
+    locateFile: (f) => `https://sql.js.org/dist/${f}`,
+  });
+  db = new SQL.Database();
+  db.run("PRAGMA user_version = 0;");
+  await saveToIndexedDB();
 }

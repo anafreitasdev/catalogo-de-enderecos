@@ -5,12 +5,11 @@ import { initDB, exec, selectAll, saveToIndexedDB } from "../db/sqlite";
 export interface Endereco {
   id?: number;
   cep: string;
-  estado: string;
-  cidade: string;
-  bairro: string;
-  logradouro: string;
-  numero: string;
-  criado_em?: string;
+  state: string;
+  city: string;
+  neighborhood: string;
+  street: string;
+  number: string;
 }
 
 export function useCatalogo() {
@@ -24,9 +23,8 @@ export function useCatalogo() {
     try {
       await initDB();
       enderecos.value = selectAll<Endereco>(
-        "SELECT id, cep, estado, cidade, bairro, logradouro, numero, criado_em FROM enderecos ORDER BY id DESC"
+        "SELECT id, cep, state, city, neighborhood, street, number FROM enderecos ORDER BY id DESC"
       );
-      console.log(enderecos.value);
     } catch (e: any) {
       erro.value = e?.message ?? String(e);
     } finally {
@@ -34,18 +32,18 @@ export function useCatalogo() {
     }
   }
 
-  async function adicionar(cep: string, estado: string, cidade: string, bairro: string, rua: string, numero: string) {
+  async function adicionar(cep: string, state: string, city: string, neighborhood: string, street: string, number: string) {
     await initDB();
-    exec("INSERT INTO enderecos (cep, estado, cidade, bairro, logradouro, numero) VALUES (?, ?, ?, ?, ?, ?)", 
-         [cep, estado, cidade, bairro, rua, numero]);
+    exec("INSERT INTO enderecos (cep, state, city, neighborhood, street, number) VALUES (?, ?, ?, ?, ?, ?)", 
+         [cep, state, city, neighborhood, street, number]);
     await saveToIndexedDB(); 
     await listar();
   }
 
-  async function atualizar(id: number, cep: string, estado: string, cidade: string, bairro: string, rua: string, numero: string) {
+  async function atualizar(id: number, cep: string, state: string, city: string, neighborhood: string, street: string, number: string) {
     await initDB();
-    exec("UPDATE enderecos SET cep = ?, estado = ?, cidade = ?, bairro = ?, logradouro = ?, numero = ? WHERE id = ?", 
-         [cep, estado, cidade, bairro, rua, numero, id]);
+    exec("UPDATE enderecos SET cep = ?, state = ?, city = ?, neighborhood = ?, street = ?, number = ? WHERE id = ?", 
+         [cep, state, city, neighborhood, street, number, id]);
     await saveToIndexedDB(); 
     await listar();
   }

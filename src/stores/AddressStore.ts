@@ -19,14 +19,7 @@ export const useAddressStore = defineStore('address', () => {
         error.value = null
         try {
             await listar()
-            addresses.value = enderecos.value.map((end: any) => ({
-                cep: end.cep,
-                estado: end.estado,
-                cidade: end.cidade,
-                bairro: end.bairro,
-                logradouro: end.logradouro,
-                numero: end.numero
-            }))
+            addresses.value = enderecos.value
         } catch (err: any) {
             error.value = err?.message ?? String(err)
         } finally {
@@ -40,18 +33,19 @@ export const useAddressStore = defineStore('address', () => {
         try {
             await adicionar(
                 address.cep,
-                address.estado,
-                address.cidade,
-                address.bairro,
-                address.logradouro,
-                address.numero
+                address.state,
+                address.city,
+                address.neighborhood,
+                address.street,
+                address.number
             )
-            await fetchAddresses()
         } catch (err: any) {
             error.value = err?.message ?? String(err)
         } finally {
             loading.value = false
         }
+
+        console.log('dentro do addAddress', error.value);
     }
 
     async function updateAddress(id: number, address: IAddress) {
@@ -61,13 +55,12 @@ export const useAddressStore = defineStore('address', () => {
             await atualizar(
                 id,
                 address.cep,
-                address.estado,
-                address.cidade,
-                address.bairro,
-                address.logradouro,
-                address.numero
+                address.state,
+                address.city,
+                address.neighborhood,
+                address.street,
+                address.number
             )
-            await fetchAddresses()
         } catch (err: any) {
             error.value = err?.message ?? String(err)
         } finally {
@@ -80,7 +73,6 @@ export const useAddressStore = defineStore('address', () => {
         error.value = null
         try {
             await remover(id)
-            await fetchAddresses()
         } catch (err: any) {
             error.value = err?.message ?? String(err)
         } finally {

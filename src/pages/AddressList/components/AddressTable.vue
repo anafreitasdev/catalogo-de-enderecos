@@ -30,16 +30,16 @@
         </thead>
         <tbody>
           <tr
-            v-for="(address, idx) in addresses"
-            :key="idx"
+            v-for="(address) in addresses"
+            :key="address.id"
             class="border-t text-sm"
           >
             <td class="px-4 py-2 text-gray-700">{{ address.cep }}</td>
-            <td class="px-4 py-2 text-gray-700">{{ address.estado }}</td>
-            <td class="px-4 py-2 text-gray-700">{{ address.cidade }}</td>
-            <td class="px-4 py-2 text-gray-700">{{ address.bairro }}</td>
-            <td class="px-4 py-2 text-gray-700">{{ address.logradouro }}</td>
-            <td class="px-4 py-2 text-gray-700">{{ address.numero }}</td>
+            <td class="px-4 py-2 text-gray-700">{{ address.state }}</td>
+            <td class="px-4 py-2 text-gray-700">{{ address.city }}</td>
+            <td class="px-4 py-2 text-gray-700">{{ address.neighborhood }}</td>
+            <td class="px-4 py-2 text-gray-700">{{ address.street }}</td>
+            <td class="px-4 py-2 text-gray-700">{{ address.number }}</td>
             <td class="px-4 py-2 flex justify-center">
               <button
                 @click="editRow(idx)"
@@ -48,7 +48,7 @@
                 {{ $t("table.buttons.edit") }}
               </button>
               <button
-                @click="deleteRow(idx)"
+                @click="deleteRow(address.id)"
                 class="text-white px-3 py-1.5 rounded-full text-sm bg-red-500 hover:bg-red-600"
               >
                 {{ $t("table.buttons.delete") }}

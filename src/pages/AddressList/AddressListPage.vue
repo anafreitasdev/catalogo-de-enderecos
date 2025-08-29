@@ -35,13 +35,14 @@
         />
       </div>
     </div>
-    <AddressTable @edit="editAddress" :addresses="addressList" />
+    <AddressTable @edit="editAddress" :addresses="addressList" @delete="deleteAddress" />
     <AddressModal
       v-if="showModal"
       :address="currentAddress"
       :show="showModal"
       @close="showModal = false"
       :typeAction="typeAction"
+      @submit="insertOrEditAddress"
     />
   </div>
 </template>
@@ -53,7 +54,6 @@ import AddressModal from "./components/AddressModal.vue";
 import type { IAddress } from "../../models/AddressInterface";
 import { useAddressStore } from "../../../src/stores/AddressStore";
 import { useI18n } from "vue-i18n";
-
 
 const search = ref("");
 const showModal = ref(false);
@@ -75,68 +75,41 @@ const addAddress = () => {
   showModal.value = true;
 };
 
+const insertOrEditAddress = (address: IAddress) => {
+  if (typeAction.value === "add") {
+    addressStore.addAddress(address);
+  } else {
+    if (currentAddress.value?.id) {
+      addressStore.updateAddress(currentAddress.value.id, address);
+    }
+  }
+  listAddresses();
+};
+
+const deleteAddress = async (id: number) => {
+  await addressStore.deleteAddress(id);
+  listAddresses();
+};
+
 const FilterAddress = (city: string) => {
   if (city === "") {
     addressList.value = addressStore.addresses;
     return;
   }
   const filtered = addressList.value.filter((addr) =>
-    addr.cidade.toLowerCase().includes(city.toLowerCase())
+    addr.city.toLowerCase().includes(city.toLowerCase())
   );
   addressList.value = filtered;
 };
 
-const addresses = [
-  {
-    cep: "01001-000",
-    estado: "SP",
-    cidade: "São Paulo",
-    bairro: "Sé",
-    logradouro: "Praça da Sé",
-    numero: "1",
-  },
-  {
-    cep: "01001-000",
-    estado: "SP",
-    cidade: "São Paulo",
-    bairro: "Sé",
-    logradouro: "Praça da Sé",
-    numero: "1",
-  },
-  {
-    cep: "01001-000",
-    estado: "SP",
-    cidade: "São Paulo",
-    bairro: "Sé",
-    logradouro: "Praça da Sé",
-    numero: "1",
-  },
-  {
-    cep: "01001-000",
-    estado: "SP",
-    cidade: "São Paulo",
-    bairro: "Sé",
-    logradouro: "Praça da Sé",
-    numero: "1",
-  },
-  {
-    cep: "01001-000",
-    estado: "SP",
-    cidade: "Petrolina",
-    bairro: "Sé",
-    logradouro: "Praça da Sé",
-    numero: "1",
-  },
-];
-
 const exportCSV = () => {
   const headers: (keyof IAddress)[] = [
     "cep",
-    "estado",
-    "cidade",
-    "bairro",
-    "logradouro",
-    "numero",
+    "state",
+    "city",
+    "neighborhood",
+    "street",
+    "number",
   ];
   const headerLabels = [
     "CEP",
@@ -174,6 +147,11 @@ const exportCSV = () => {
   URL.revokeObjectURL(url);
 };
 
+const listAddresses = async () => {
+  await addressStore.fetchAddresses();
+  addressList.value = addressStore.addresses;
+};
+
 watch(search, (newSearch) => {
   if (timeOut) {
     clearTimeout(timeOut.value);
@@ -183,8 +161,7 @@ watch(search, (newSearch) => {
   }, 500);
 });
 
-onMounted(() => {
-  addressStore.setAddresses(addresses);
-  addressList.value = addressStore.addresses;
+onMounted(async () => {
+  await listAddresses();
 });
 </script>
