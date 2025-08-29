@@ -42,5 +42,20 @@ export function useCatalogo() {
     await listar();
   }
 
-  return { enderecos, carregando, erro, listar, adicionar };
+  async function atualizar(id: number, cep: string, estado: string, cidade: string, bairro: string, rua: string, numero: string) {
+    await initDB();
+    exec("UPDATE enderecos SET cep = ?, estado = ?, cidade = ?, bairro = ?, rua = ?, numero = ? WHERE id = ?", 
+         [cep, estado, cidade, bairro, rua, numero, id]);
+    await saveToIndexedDB(); // persist after write
+    await listar();
+  }
+
+  async function remover(id: number) {  
+    await initDB();
+    exec("DELETE FROM enderecos WHERE id = ?", [id]);
+    await saveToIndexedDB(); // persist after write
+    await listar();
+  }
+
+  return { enderecos, carregando, erro, listar, adicionar, atualizar, remover };
 }
