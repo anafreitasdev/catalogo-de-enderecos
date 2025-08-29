@@ -115,7 +115,7 @@ export function selectAll<T = any>(
 
 export async function saveToIndexedDB(): Promise<void> {
   if (!db) throw new Error("DB não inicializado. Chame initDB() antes.");
-  const data = db.export(); // Uint8Array
+  const data = db.export();
   await idbSet(IDB_KEY, data);
 }
 

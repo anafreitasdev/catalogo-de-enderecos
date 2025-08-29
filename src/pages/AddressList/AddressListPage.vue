@@ -135,8 +135,7 @@ const exportCSV = () => {
     t("table.header.number"),
   ];
 
-  const delimiter = locale.value === "pt" ? ";" : ",";
-
+  const delimiter = ";";
   const quote = (value: string) => {
     const v = value ?? "";
     return `"${String(v).replace(/"/g, '""')}"`;

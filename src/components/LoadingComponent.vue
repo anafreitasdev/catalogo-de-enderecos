@@ -57,7 +57,7 @@ const startLoading = () => {
     } else {
       progress.value = (elapsed / props.timeout) * 100;
     }
-  }, 16); // ~60fps para animação suave
+  }, 16);
 };
 
 const stopLoading = () => {
@@ -74,7 +74,6 @@ const resetLoading = () => {
   progress.value = 0;
 };
 
-// Expor métodos para uso externo
 defineExpose({
   startLoading,
   stopLoading,
@@ -93,7 +92,6 @@ onUnmounted(() => {
   }
 });
 
-// Emitir evento de timeout quando o loading terminar
 watch(() => progress.value, (newProgress) => {
   if (newProgress >= 100) {
     emit('timeout');

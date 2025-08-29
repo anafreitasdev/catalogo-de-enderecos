@@ -59,10 +59,10 @@ const emit = defineEmits(["edit", "delete"]);
 
 const fields = [
   { key: "cep", label: "table.header.zip" },
-  { key: "estado", label: "table.header.state" },
-  { key: "cidade", label: "table.header.city" },
-  { key: "bairro", label: "table.header.neighborhood" },
-  { key: "logradouro", label: "table.header.street" },
-  { key: "numero", label: "table.header.number" },
+  { key: "state", label: "table.header.state" },
+  { key: "city", label: "table.header.city" },
+  { key: "neighborhood", label: "table.header.neighborhood" },
+  { key: "street", label: "table.header.street" },
+  { key: "number", label: "table.header.number" },
 ];
 </script>

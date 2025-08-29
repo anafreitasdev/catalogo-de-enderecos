@@ -9,7 +9,6 @@ export function usePageTitle() {
     document.documentElement.lang = locale.value
   }
 
-  // Atualiza o título quando o idioma mudar
   watch(locale, updatePageTitle, { immediate: true })
 
   return {
