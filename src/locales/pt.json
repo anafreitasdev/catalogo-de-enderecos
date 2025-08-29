@@ -1,4 +1,9 @@
 {
+  "pageTitle": "Catálogo de Endereços",
+  "navbar": {
+    "brand": "Catálogo de Endereços",
+    "home": "Início"
+  },
   "welcome": "Bem-vindo ao Catálogo de Endereços",
   "hello": "Olá! Este é um sistema completo para gerenciar endereços.",
   "description": "Gerencie, pesquise e organize seus endereços de forma eficiente.",
@@ -9,13 +14,39 @@
     "management": "Gerenciamento organizado de dados"
   },
   "table": {
+     "title": "Lista de endereços",
+    "buttons": {
+      "add": "Novo endereço",
+      "export": "Exportar CSV",
+      "edit": "Editar",
+      "delete": "Excluir",
+      "cancel": "Cancelar",
+      "save": "Salvar"
+    },
+    "inputs": {
+      "search": "Pesquisar por cidade"
+    },
     "header": {
       "name": "Nome",
       "address": "Endereço",
       "city": "Cidade",
       "state": "Estado",
       "zip": "CEP",
+      "neighborhood": "Bairro",
+      "street": "Rua",
+      "number": "Número",
       "actions": "Ações"
+    },
+    "modal": {
+      "edit": {
+        "title": "Editar Endereço"
+      },
+      "add": {
+        "title": "Adicionar Novo Endereço"
+      }
     }
+  },
+  "loading": {
+    "message": "Carregando..."
   }
 }
