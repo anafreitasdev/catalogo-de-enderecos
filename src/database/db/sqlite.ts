@@ -73,7 +73,7 @@ async function ensureSchema() {
       estado TEXT NOT NULL,
       cidade TEXT NOT NULL,
       bairro TEXT NOT NULL,
-      rua TEXT NOT NULL,
+      logradouro TEXT NOT NULL,
       numero TEXT NOT NULL,
       criado_em TEXT DEFAULT (datetime('now'))
     );

@@ -8,7 +8,7 @@ export interface Endereco {
   estado: string;
   cidade: string;
   bairro: string;
-  rua: string;
+  logradouro: string;
   numero: string;
   criado_em?: string;
 }
@@ -24,7 +24,7 @@ export function useCatalogo() {
     try {
       await initDB();
       enderecos.value = selectAll<Endereco>(
-        "SELECT id, cep, estado, cidade, bairro, rua, numero, criado_em FROM enderecos ORDER BY id DESC"
+        "SELECT id, cep, estado, cidade, bairro, logradouro, numero, criado_em FROM enderecos ORDER BY id DESC"
       );
       console.log(enderecos.value);
     } catch (e: any) {
@@ -36,7 +36,7 @@ export function useCatalogo() {
 
   async function adicionar(cep: string, estado: string, cidade: string, bairro: string, rua: string, numero: string) {
     await initDB();
-    exec("INSERT INTO enderecos (cep, estado, cidade, bairro, rua, numero) VALUES (?, ?, ?, ?, ?, ?)", 
+    exec("INSERT INTO enderecos (cep, estado, cidade, bairro, logradouro, numero) VALUES (?, ?, ?, ?, ?, ?)", 
          [cep, estado, cidade, bairro, rua, numero]);
     await saveToIndexedDB(); // persist after write
     await listar();
@@ -44,7 +44,7 @@ export function useCatalogo() {
 
   async function atualizar(id: number, cep: string, estado: string, cidade: string, bairro: string, rua: string, numero: string) {
     await initDB();
-    exec("UPDATE enderecos SET cep = ?, estado = ?, cidade = ?, bairro = ?, rua = ?, numero = ? WHERE id = ?", 
+    exec("UPDATE enderecos SET cep = ?, estado = ?, cidade = ?, bairro = ?, logradouro = ?, numero = ? WHERE id = ?", 
          [cep, estado, cidade, bairro, rua, numero, id]);
     await saveToIndexedDB(); // persist after write
     await listar();
