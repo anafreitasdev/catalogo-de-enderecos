@@ -21,30 +21,66 @@
         }}
       </h2>
 
+      <div
+        v-if="errorMessage"
+        class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm flex items-center justify-between"
+      >
+        <span>{{ errorMessage }}</span>
+        <button
+          @click="errorMessage = ''"
+          class="text-red-500 hover:text-red-700 font-bold text-lg"
+        >
+          &times;
+        </button>
+      </div>
+
       <form @submit.prevent="submit" class="flex flex-col gap-3">
-        <InputComponent
-          v-model="form.cep"
-          :placeholder="$t('table.header.zip')"
-        />
-        <InputComponent
+        <div class="relative">
+          <input
+            v-model="form.cep"
+            :placeholder="$t('table.header.zip')"
+            :disabled="isLoadingCep"
+            maxlength="8"
+            class="w-full px-4 py-2 rounded-xl border border-gray-300 outline-none bg-gray-50 text-xs md:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+          <div
+            v-if="isLoadingCep"
+            class="absolute right-3 top-1/2 transform -translate-y-1/2"
+          >
+            <div
+              class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-900"
+            ></div>
+          </div>
+        </div>
+        <input
           v-model="form.state"
           :placeholder="$t('table.header.state')"
+          :disabled="isLoadingCep"
+          class="w-full px-4 py-2 rounded-xl border border-gray-300 outline-none bg-gray-50 text-xs md:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
         />
-        <InputComponent
+        <input
           v-model="form.city"
           :placeholder="$t('table.header.city')"
+          :disabled="isLoadingCep"
+          class="w-full px-4 py-2 rounded-xl border border-gray-300 outline-none bg-gray-50 text-xs md:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
         />
-        <InputComponent
+        <input
           v-model="form.neighborhood"
           :placeholder="$t('table.header.neighborhood')"
+          :disabled="isLoadingCep"
+          class="w-full px-4 py-2 rounded-xl border border-gray-300 outline-none bg-gray-50 text-xs md:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
         />
-        <InputComponent
+        <input
           v-model="form.street"
           :placeholder="$t('table.header.street')"
+          :disabled="isLoadingCep"
+          class="w-full px-4 py-2 rounded-xl border border-gray-300 outline-none bg-gray-50 text-xs md:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
         />
-        <InputComponent
+        <input
           v-model="form.number"
           :placeholder="$t('table.header.number')"
+          :disabled="isLoadingCep"
+          class="w-full px-4 py-2 rounded-xl border border-gray-300 outline-none bg-gray-50 text-xs md:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
         />
 
         <div class="flex gap-3 justify-end mt-4">
@@ -68,19 +104,23 @@
 </template>
 
 <script setup lang="ts">
-import InputComponent from "../../../components/InputComponent.vue";
-import { onMounted, ref, type PropType } from "vue";
+import { onMounted, ref, type PropType, watch } from "vue";
 import type { IAddress } from "../../../models/AddressInterface";
+import { ViaCepService } from "../../../services/viaCep.service";
 
 const emit = defineEmits(["close"]);
 const form = ref({
-  cep: "12312",
+  cep: "",
   state: "",
   city: "",
   neighborhood: "",
   street: "",
   number: "",
 });
+
+const isLoadingCep = ref(false);
+const errorMessage = ref("");
+
 const props = defineProps({
   show: Boolean,
   typeAction: {
@@ -92,6 +132,56 @@ const props = defineProps({
     required: false,
   },
 });
+
+// Watcher para o campo CEP
+watch(
+  () => form.value.cep,
+  async (newCep) => {
+    // Limpa mensagem de erro anterior
+    errorMessage.value = "";
+
+    if (newCep && newCep.length === 8) {
+      await buscarCep(newCep);
+    }
+  }
+);
+
+async function buscarCep(cep: string) {
+  try {
+    isLoadingCep.value = true;
+    errorMessage.value = "";
+
+    form.value.state = "";
+    form.value.city = "";
+    form.value.neighborhood = "";
+    form.value.street = "";
+
+    const endereco = await ViaCepService.buscarPorCep(cep);
+
+    form.value.state = endereco.uf;
+    form.value.city = endereco.localidade;
+    form.value.neighborhood = endereco.bairro;
+    form.value.street = endereco.logradouro;
+  } catch (error) {
+    console.error("Erro ao buscar CEP:", error);
+
+    if (error instanceof Error) {
+      if (error.message.includes("CEP não encontrado")) {
+        errorMessage.value = "CEP não encontrado. Verifique se está correto.";
+      } else if (error.message.includes("CEP deve ter 8 dígitos")) {
+        errorMessage.value = "CEP deve ter 8 dígitos.";
+      } else if (error.message.includes("Erro na requisição")) {
+        errorMessage.value = "Erro ao conectar com o serviço. Tente novamente.";
+      } else {
+        errorMessage.value = "Erro ao buscar CEP. Tente novamente.";
+      }
+    } else {
+      errorMessage.value = "Erro inesperado ao buscar CEP.";
+    }
+  } finally {
+    isLoadingCep.value = false;
+  }
+}
 
 function close() {
   emit("close");
