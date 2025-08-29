@@ -1,4 +1,9 @@
 {
+  "pageTitle": "Address Catalog",
+  "navbar": {
+    "brand": "Address Catalog",
+    "home": "Home"
+  },
   "welcome": "Welcome to Address Catalog",
   "hello": "Hello! This is a complete system for managing addresses.",
   "description": "Manage, search and organize your addresses efficiently.",

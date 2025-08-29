@@ -1,4 +1,9 @@
 {
+  "pageTitle": "Catálogo de Endereços",
+  "navbar": {
+    "brand": "Catálogo de Endereços",
+    "home": "Início"
+  },
   "welcome": "Bem-vindo ao Catálogo de Endereços",
   "hello": "Olá! Este é um sistema completo para gerenciar endereços.",
   "description": "Gerencie, pesquise e organize seus endereços de forma eficiente.",

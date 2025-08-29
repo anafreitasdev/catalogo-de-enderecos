@@ -12,24 +12,24 @@
         <option value="en">English</option>
       </select>
     </div>
-
-    <h1 class="text-4xl font-bold text-gray-800 mb-4">{{ $t("welcome") }}</h1>
-    <p class="text-lg text-gray-600 mb-4">{{ $t("hello") }}</p>
-    <p class="text-lg text-gray-600 mb-8">{{ $t("description") }}</p>
-
+    
+    <h1 class="text-4xl font-bold text-gray-800 mb-4">{{ $t('welcome') }}</h1>
+    <p class="text-lg text-gray-600 mb-4">{{ $t('hello') }}</p>
+    <p class="text-lg text-gray-600 mb-8">{{ $t('description') }}</p>
+    
     <div class="mt-8 p-6 bg-gray-50 rounded-lg">
       <h2 class="text-2xl font-semibold text-gray-800 mb-4">
-        {{ $t("features.title") }}
+        {{ $t('features.title') }}
       </h2>
       <ul class="space-y-3">
         <li class="py-2 border-b border-gray-200 last:border-b-0 text-gray-700">
-          {{ $t("features.address") }}
+          {{ $t('features.address') }}
         </li>
         <li class="py-2 border-b border-gray-200 last:border-b-0 text-gray-700">
-          {{ $t("features.search") }}
+          {{ $t('features.search') }}
         </li>
         <li class="py-2 border-b border-gray-200 last:border-b-0 text-gray-700">
-          {{ $t("features.management") }}
+          {{ $t('features.management') }}
         </li>
       </ul>
     </div>
