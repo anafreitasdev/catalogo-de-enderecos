@@ -38,7 +38,7 @@ export function useCatalogo() {
     await initDB();
     exec("INSERT INTO enderecos (cep, estado, cidade, bairro, logradouro, numero) VALUES (?, ?, ?, ?, ?, ?)", 
          [cep, estado, cidade, bairro, rua, numero]);
-    await saveToIndexedDB(); // persist after write
+    await saveToIndexedDB(); 
     await listar();
   }
 
@@ -46,14 +46,14 @@ export function useCatalogo() {
     await initDB();
     exec("UPDATE enderecos SET cep = ?, estado = ?, cidade = ?, bairro = ?, logradouro = ?, numero = ? WHERE id = ?", 
          [cep, estado, cidade, bairro, rua, numero, id]);
-    await saveToIndexedDB(); // persist after write
+    await saveToIndexedDB(); 
     await listar();
   }
 
   async function remover(id: number) {  
     await initDB();
     exec("DELETE FROM enderecos WHERE id = ?", [id]);
-    await saveToIndexedDB(); // persist after write
+    await saveToIndexedDB(); 
     await listar();
   }
 

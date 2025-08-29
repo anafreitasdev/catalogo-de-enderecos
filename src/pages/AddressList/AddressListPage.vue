@@ -54,13 +54,14 @@ import type { IAddress } from "../../models/AddressInterface";
 import { useAddressStore } from "../../../src/stores/AddressStore";
 import { useI18n } from "vue-i18n";
 
+
 const search = ref("");
 const showModal = ref(false);
 const typeAction = ref("");
 const { locale } = useI18n();
 const addressStore = useAddressStore();
 const addressList = ref<IAddress[]>([]);
-const timeOut = ref<number | undefined>();
+const timeOut = ref<NodeJS.Timeout | undefined>();
 const currentAddress = ref<IAddress>();
 
 const editAddress = (adress: IAddress) => {

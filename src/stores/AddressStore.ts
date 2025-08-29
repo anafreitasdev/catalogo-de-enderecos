@@ -1,7 +1,7 @@
 import { ref } from "vue"
 import { defineStore } from "pinia"
 import type { IAddress } from "@/models/AddressInterface"
-import { useCatalogo } from "@/database/composables/useCatalogo"
+import { useCatalogo } from "../database/composables/useCatalogo"
 
 const { listar, adicionar, atualizar, remover, enderecos } = useCatalogo()
 
