@@ -1,9 +1,9 @@
 import type { IViaCep } from '../models/ViacepInterface';
 
-export class ViaCepService {
-  private static readonly BASE_URL = 'https://viacep.com.br/ws';
+const BASE_URL = 'https://viacep.com.br/ws';
 
-  static async buscarPorCep(cep: string): Promise<IViaCep> {
+export const ViaCepService = {
+  async searchByZipCode(cep: string): Promise<IViaCep> {
     try {
       const cepLimpo = cep.replace(/\D/g, '');
       
@@ -11,7 +11,7 @@ export class ViaCepService {
         throw new Error('CEP deve ter 8 dígitos');
       }
 
-      const response = await fetch(`${this.BASE_URL}/${cepLimpo}/json/`);
+      const response = await fetch(`${BASE_URL}/${cepLimpo}/json/`);
       
       if (!response.ok) {
         throw new Error('Erro na requisição');
@@ -29,4 +29,4 @@ export class ViaCepService {
       throw error;
     }
   }
-}
+};

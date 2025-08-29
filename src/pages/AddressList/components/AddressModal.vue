@@ -40,7 +40,9 @@
             v-model="form.cep"
             :placeholder="$t('table.header.zip')"
             :disabled="isLoadingCep"
-            maxlength="8"
+            maxlength="9"
+            @input="handleZipCodeInput"
+            @keypress="allowOnlyNumbers"
             class="w-full px-4 py-2 rounded-xl border border-gray-300 outline-none bg-gray-50 text-xs md:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
           />
           <div
@@ -106,7 +108,8 @@
 <script setup lang="ts">
 import { onMounted, ref, type PropType, watch } from "vue";
 import type { IAddress } from "../../../models/AddressInterface";
-import { ViaCepService } from "../../../services/viaCep.service";
+import { ViaCepService } from "../../../services/viacep.service";
+import { allowOnlyNumbers, formatZipCode } from "../../../utils/maskUtils";
 
 const emit = defineEmits(["close"]);
 const form = ref({
@@ -133,20 +136,23 @@ const props = defineProps({
   },
 });
 
-// Watcher para o campo CEP
 watch(
   () => form.value.cep,
   async (newCep) => {
-    // Limpa mensagem de erro anterior
     errorMessage.value = "";
-
-    if (newCep && newCep.length === 8) {
-      await buscarCep(newCep);
+    const cepLimpo = newCep.replace(/\D/g, "");
+    if (cepLimpo.length === 8) {
+      await searchZipCode(cepLimpo);
     }
   }
 );
 
-async function buscarCep(cep: string) {
+function handleZipCodeInput(event: Event) {
+  const input = event.target as HTMLInputElement;
+  form.value.cep = formatZipCode(input.value);
+}
+
+async function searchZipCode(cep: string) {
   try {
     isLoadingCep.value = true;
     errorMessage.value = "";
@@ -156,7 +162,7 @@ async function buscarCep(cep: string) {
     form.value.neighborhood = "";
     form.value.street = "";
 
-    const endereco = await ViaCepService.buscarPorCep(cep);
+    const endereco = await ViaCepService.searchByZipCode(cep);
 
     form.value.state = endereco.uf;
     form.value.city = endereco.localidade;
